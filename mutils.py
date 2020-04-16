@@ -1,4 +1,4 @@
-def typeSwap(dataframe):
+def normalizePrice(dataframe):
     itemPrice_new = ''
 
     for index, row in dataframe.iterrows():
@@ -6,3 +6,5 @@ def typeSwap(dataframe):
         dataframe.at[index, 'Price'] = float(itemPrice_new)
 
     return dataframe
+
+
