@@ -3,6 +3,7 @@ import random
 import pandas as pd
 from bs4 import BeautifulSoup
 from utils import extractPrice, extractTitle, extractLocation, extractDate
+from mutils import typeSwap
 
 user_agent_list = [
    #Chrome
@@ -161,10 +162,10 @@ def main():
 
     data = {'Price': prices,'Title': titles, 'Location': locations, 'Date': dates, 'Url': urls}
     df = pd.DataFrame(data, columns = ['Price','Title','Location','Date','Url'])
-
-    print(df.head())
-    print(df.shape)
-    df.to_csv('final-CPU.csv', sep=',', index=False)
+    data = typeSwap(df)
+    # print(df.head())
+    # print(df.shape)
+    data.to_csv('first-pipeline_.csv', sep=',', index=False)
 
     
 if __name__ == '__main__':
