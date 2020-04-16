@@ -1,4 +1,4 @@
-This is a project created for a introduction to programming course at University of Gdańsk.
+his is a project created for a introduction to programming course at University of Gdańsk.
 It scrapes the prices and links to iPhones currently listed on OLX and allows the user to find a suitable listing.
 
 To run this project, make sure python and pip is installed on your device.

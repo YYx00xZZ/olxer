@@ -2,7 +2,7 @@ import requests
 import random
 import pandas as pd
 from bs4 import BeautifulSoup
-
+from utils import extractPrice, extractTitle, extractLocation, extractDate
 
 user_agent_list = [
    #Chrome
@@ -98,29 +98,34 @@ def main():
     locations = []
     dates = []
     urls = []
+    # promoted = []
 
     containers = soup.find_all('div', class_='offer-wrapper')
-    # print(containers)
     if p == 0:
         for x in containers:
-            price_wrapper = x.find('p', class_='price')
-            price = price_wrapper.find('strong').text
-            prices.append(price)
+            # price_wrapper = x.find('p', class_='price')
+            # price = price_wrapper.find('strong').text
+            # prices.append(price)
+            prices.append(extractPrice(x))
             
-            title_wrapper = x.find('h3')
-            title = title_wrapper.find('strong').text
-            titles.append(title)
+            # title_wrapper = x.find('h3')
+            # title = title_wrapper.find('strong').text
+            # titles.append(title)
+            titles.append(extractTitle(x))
 
-            location_wrapper = x.find('i', attrs={'data-icon': 'location-filled'})
-            location = location_wrapper.parent.text
-            locations.append(location)
+            # location_wrapper = x.find('i', attrs={'data-icon': 'location-filled'})
+            # location = location_wrapper.parent.text
+            # locations.append(location)
+            locations.append(extractLocation(x))
 
-            date_wrapper = x.find('i', attrs={'data-icon': 'clock'})
-            date = date_wrapper.parent.text
-            dates.append(date)
+            # date_wrapper = x.find('i', attrs={'data-icon': 'clock'})
+            # date = date_wrapper.parent.text
+            # dates.append(date)
+            dates.append(extractDate(x))
 
             url = x.find('a', class_='linkWithHash')["href"]
             urls.append(url)
+
             # print(price)
             # print(title)
     else:
@@ -129,21 +134,25 @@ def main():
             soup = getSoup(pageUrl)
 
             for x in containers:
-                price_wrapper = x.find('p', class_='price')
-                price = price_wrapper.find('strong').text
-                prices.append(price)
+                # price_wrapper = x.find('p', class_='price')
+                # price = price_wrapper.find('strong').text
+                # prices.append(price)
+                prices.append(extractPrice(x))
+                
+                # title_wrapper = x.find('h3')
+                # title = title_wrapper.find('strong').text
+                # titles.append(title)
+                titles.append(extractTitle(x))
 
-                title_wrapper = x.find('h3')
-                title = title_wrapper.find('strong').text
-                titles.append(title)
+                # location_wrapper = x.find('i', attrs={'data-icon': 'location-filled'})
+                # location = location_wrapper.parent.text
+                # locations.append(location)
+                locations.append(extractLocation(x))
 
-                location_wrapper = x.find('i', attrs={'data-icon': 'location-filled'})
-                location = location_wrapper.parent.text
-                locations.append(location)
-        
-                date_wrapper = x.find('i', attrs={'data-icon': 'clock'})
-                date = date_wrapper.parent.text
-                dates.append(date)
+                # date_wrapper = x.find('i', attrs={'data-icon': 'clock'})
+                # date = date_wrapper.parent.text
+                # dates.append(date)
+                dates.append(extractDate(x))
 
                 url = x.find('a', class_='linkWithHash')["href"]
                 urls.append(url)
@@ -155,7 +164,7 @@ def main():
 
     print(df.head())
     print(df.shape)
-    df.to_csv('final.csv', sep=',', index=False)
+    df.to_csv('final-CPU.csv', sep=',', index=False)
 
     
 if __name__ == '__main__':
