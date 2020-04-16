@@ -63,7 +63,7 @@ def createRandomIndex(optionList):
 
 def createUrl(query, page=1):
     preparedQuery = prepareQuery(query)
-    url = f"https://www.olx.pl/elektronika/telefony-komorkowe/iphone/q-{preparedQuery}/"
+    url = f"https://www.olx.bg/elektronika/kompyutrni-aksesoari-chasti/q-{preparedQuery}/"
 
     if page > 1:
         url += f"?page={page}"
