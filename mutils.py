@@ -1,3 +1,5 @@
+import re
+
 def normalizePrice(dataframe):
     itemPrice_new = ''
 
@@ -7,4 +9,12 @@ def normalizePrice(dataframe):
 
     return dataframe
 
+
+def normalizeLocation(dataframe):
+    for index,row in dataframe.iterrows():
+        sep = ', '
+        itemLocation_new = row['Location']
+        dataframe.at[index, 'Location'] = itemLocation_new.split(sep, 1)[0]
+
+    return dataframe
 

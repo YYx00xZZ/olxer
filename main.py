@@ -3,7 +3,7 @@ import random
 import pandas as pd
 from bs4 import BeautifulSoup
 from utils import extractPrice, extractTitle, extractLocation, extractDate
-from mutils import normalizePrice
+from mutils import normalizePrice, normalizeLocation
 
 user_agent_list = [
    #Chrome
@@ -168,91 +168,19 @@ def scraper(url):
 
     data = {'Price': prices,'Title': titles, 'Location': locations, 'Date': dates, 'Url': urls}
     return data
-#========================================
-
 
 def main():
     outputcsv = forgeOutputPath(input('ENTER FILE NAME: '))
     url = forgeQuery(input('SEARCH KEYWORD: '))
 
-# #========================================
-#     soup = getSoup(url)
 
-#     p = howManyPages(soup)
-
-#     prices = []
-#     titles = []
-#     locations = []
-#     dates = []
-#     urls = []
-#     # promoted = []
-
-#     containers = soup.find_all('div', class_='offer-wrapper')
-#     if p == 0:
-#         for x in containers:
-#             # price_wrapper = x.find('p', class_='price')
-#             # price = price_wrapper.find('strong').text
-#             # prices.append(price)
-#             prices.append(extractPrice(x))
-            
-#             # title_wrapper = x.find('h3')
-#             # title = title_wrapper.find('strong').text
-#             # titles.append(title)
-#             titles.append(extractTitle(x))
-
-#             # location_wrapper = x.find('i', attrs={'data-icon': 'location-filled'})
-#             # location = location_wrapper.parent.text
-#             # locations.append(location)
-#             locations.append(extractLocation(x))
-
-#             # date_wrapper = x.find('i', attrs={'data-icon': 'clock'})
-#             # date = date_wrapper.parent.text
-#             # dates.append(date)
-#             dates.append(extractDate(x))
-
-#             url = x.find('a', class_='linkWithHash')["href"]
-#             urls.append(url)
-
-#             # print(price)
-#             # print(title)
-#     else:
-#         for pageNum in range(1, p):
-#             pageUrl = url+'&page='+str(pageNum)
-#             soup = getSoup(pageUrl)
-
-#             for x in containers:
-#                 # price_wrapper = x.find('p', class_='price')
-#                 # price = price_wrapper.find('strong').text
-#                 # prices.append(price)
-#                 prices.append(extractPrice(x))
-                
-#                 # title_wrapper = x.find('h3')
-#                 # title = title_wrapper.find('strong').text
-#                 # titles.append(title)
-#                 titles.append(extractTitle(x))
-
-#                 # location_wrapper = x.find('i', attrs={'data-icon': 'location-filled'})
-#                 # location = location_wrapper.parent.text
-#                 # locations.append(location)
-#                 locations.append(extractLocation(x))
-
-#                 # date_wrapper = x.find('i', attrs={'data-icon': 'clock'})
-#                 # date = date_wrapper.parent.text
-#                 # dates.append(date)
-#                 dates.append(extractDate(x))
-
-#                 url = x.find('a', class_='linkWithHash')["href"]
-#                 urls.append(url)
-#                 # print(price)
-#                 # print(title)
-# #========================================
-    # data = {'Price': prices,'Title': titles, 'Location': locations, 'Date': dates, 'Url': urls}
     data = scraper(url)
     df = pd.DataFrame(data, columns = ['Price','Title','Location','Date','Url'])
     data = normalizePrice(df)
+    locdata = normalizeLocation(data)
     # print(df.head())
     # print(df.shape)
-    data.to_csv(outputcsv, sep=',', index=False)
+    locdata.to_csv(outputcsv, sep=',', index=False)
 
     
 if __name__ == '__main__':
