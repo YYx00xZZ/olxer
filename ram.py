@@ -97,6 +97,8 @@ def main():
     titles = []
     locations = []
     dates = []
+    urls = []
+
     containers = soup.find_all('div', class_='offer-wrapper')
     # print(containers)
     if p == 0:
@@ -118,6 +120,7 @@ def main():
             dates.append(date)
 
             url = x.find('a', class_='linkWithHash')["href"]
+            urls.append(url)
             # print(price)
             # print(title)
     else:
@@ -142,12 +145,13 @@ def main():
                 date = date_wrapper.parent.text
                 dates.append(date)
 
-                url = x.find('a', class_='linkWithHash')["href"]        
+                url = x.find('a', class_='linkWithHash')["href"]
+                urls.append(url)
                 # print(price)
                 # print(title)
 
-    data = {'Price': prices,'Title': titles, 'Location': locations, 'Date': dates}
-    df = pd.DataFrame(data, columns = ['Price','Title','Location','Date'])
+    data = {'Price': prices,'Title': titles, 'Location': locations, 'Date': dates, 'Url': urls}
+    df = pd.DataFrame(data, columns = ['Price','Title','Location','Date','Url'])
 
     print(df.head())
     print(df.shape)
