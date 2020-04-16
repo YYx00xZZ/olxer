@@ -3,6 +3,6 @@ def typeSwap(dataframe):
 
     for index, row in dataframe.iterrows():
         itemPrice_new = str(row['Price']).strip(' лв.')
-        dataframe.at[index, 'Price'] = int(itemPrice_new)
+        dataframe.at[index, 'Price'] = float(itemPrice_new)
 
     return dataframe

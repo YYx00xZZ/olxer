@@ -1,3 +1,5 @@
+import sys, getopt
+
 import requests
 import random
 import pandas as pd
@@ -33,10 +35,10 @@ user_agent_list = [
     'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)'
 ]
 
-def forgeQuery():
+def forgeQuery(task):
     link = 'https://www.olx.bg/elektronika/kompyutrni-aksesoari-chasti/q-'
-    query = input('Part to search for: ')
-    url = link+query
+    # query = input('Part to search for: ')
+    url = link+task
     return url
 
 
@@ -88,8 +90,30 @@ def makeLink(page, url):
             return i
 
 
-def main():
-    url = forgeQuery()
+def main(argv):
+    findtask = ''
+    outputfile = ''
+    try:
+        opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
+    except getopt.GetoptError:
+        print( 'ram.py -i <findtask> -o <outputfile>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print( 'test.py -i <findtask> -o <outputfile>')
+            sys.exit()
+        elif opt in ("-i", "--ifile"):
+            findtask = arg
+        elif opt in ("-o", "--ofile"):
+            outputfile = arg
+    # print( 'Input file is "', findtask)
+    # print( 'Output file is "', outputfile)
+
+    if findtask != '':
+        url = forgeQuery(findtask)
+    else:
+        url = forgeQuery(input("Type task to search for: "))
+    # url = forgeQuery(), findtask
     soup = getSoup(url)
 
     p = howManyPages(soup)
@@ -165,8 +189,8 @@ def main():
     data = typeSwap(df)
     # print(df.head())
     # print(df.shape)
-    data.to_csv('first-pipeline_.csv', sep=',', index=False)
+    data.to_csv(outputfile, sep=',', index=False)
 
     
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
