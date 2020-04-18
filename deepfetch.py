@@ -57,5 +57,6 @@ def deepfetch_date(soup):
 def deepfetch_city(soup):
     """ get  city"""
     userContainer = soup.find('div', attrs={'id':'offeractions'})
-    city = userContainer.find('div', attrs={'class': 'offer-user__address'}).p.text
+    # city = userContainer.find('div', attrs={'class': 'offer-user__address'}).p.text
+    city = userContainer.find('div', class_= 'offer-user__address').address.text
     return city

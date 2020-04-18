@@ -191,7 +191,7 @@ def main(category, item):
     data = scraper(f'https://www.olx.bg{categ(category)}{neshto(item)}')
     df = pd.DataFrame(data, columns = ['Title', 'Url'])
     
-    df.to_csv(f'first_state{category}.csv', sep=',', index=False)
+    df.to_csv(f'first_state_{category}.csv', sep=',', index=False)
     
     dPrices = []
     dTitles = []
@@ -220,8 +220,10 @@ def main(category, item):
     dataf = pd.DataFrame(data, columns=['Price', 'Title', 'City', 'Date'])
     
     dataTest = normalizePrice(dataf)
+
+    datatest = normalizeLocation(dataTest)
     
-    dataTest.to_csv(f'searchOn_{category}.csv', sep=',', index=False)
+    datatest.to_csv(f'searchOn_{category}.csv', sep=',', index=False)
     
 if __name__ == '__main__':
     main()
