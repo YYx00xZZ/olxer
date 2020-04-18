@@ -11,6 +11,7 @@ def normalizePrice(dataframe):
 
 
 def normalizeLocation(dataframe):
+    """ personal product location(city) data shape changed. TODO """
     for index,row in dataframe.iterrows():
         sep = ', '
         itemLocation_new = row['Location']

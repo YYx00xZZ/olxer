@@ -216,10 +216,12 @@ def main(category, item):
         date = deepfetch_date(profile)
         dDates.append(date)
     data = {'Price': dPrices,'Title': dTitles, 'City': dCities, 'Date': dDates}
-    
+
     dataf = pd.DataFrame(data, columns=['Price', 'Title', 'City', 'Date'])
     
-    dataf.to_csv(f'searchOn_{category}.csv', sep=',', index=False)
+    dataTest = normalizePrice(dataf)
+    
+    dataTest.to_csv(f'searchOn_{category}.csv', sep=',', index=False)
     
 if __name__ == '__main__':
     main()
