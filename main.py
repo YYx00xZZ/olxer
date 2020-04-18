@@ -6,6 +6,8 @@ from bs4 import BeautifulSoup
 from utils import extractPrice, extractTitle, extractLocation, extractDate
 from mutils import normalizePrice, normalizeLocation
 
+from deepfetch import deepfetch, deepfetch_price, deepfetch_title, deepfetch_city, deepfetch_date
+
 user_agent_list = [
    #Chrome
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
@@ -127,20 +129,20 @@ def scraper(url):
                 titles.append(name)
     else:
         for pageNum in range(1, p):
-            print(f'from else: pageNum - {pageNum}')
+            # print(f'from else: pageNum - {pageNum}')
 
             pageUrl = f'{queryUrl}/?page={str(pageNum)}'
-            print(f'from else: pageUrl - {pageUrl}')
+            # print(f'from else: pageUrl - {pageUrl}')
 
             soup = getSoup(pageUrl)
             a = soup.findAll('td', class_='title-cell') 
             for x in a:
                 url = x.find('a', class_='linkWithHash')['href']
-                print(f'from else_for: {url}')
+                # print(f'from else_for: {url}')
                 name = x.find('a', class_='linkWithHash')('strong')
 
                 # urls.append(url)
-                print('from here', pageUrl)
+                # print('from here', pageUrl)
 
                 if ';promoted' in pageUrl:
                     urls_promoted.append(pageUrl)
@@ -200,16 +202,39 @@ def neshto(nsh):
 def main(category, item):
     # url = f'https://www.olx.bg{categ(category)}{neshto(item)}'
     data = scraper(f'https://www.olx.bg{categ(category)}{neshto(item)}')
-    ...
     df = pd.DataFrame(data, columns = ['Title', 'Url'])
-    # data = normalizePrice(df)
-    # locdata = normalizeLocation(data)
-    # print(df.head())
-    print(df.shape)
-    df.to_csv('from_def_main.csv', sep=',', index=False)
-    # duplicatedRs = df[df.duplicated(['Url'])]
-    # print('Duplicated rows: ', duplicatedRs, sep='\n')
-    # locdata.to_csv(outputcsv, sep=',', index=False)
+    
+    df.to_csv('first_state.csv', sep=',', index=False)
+    
+    dPrices = []
+    dTitles = []
+    dCities = []
+    dDates = []
+    
+    for label, row in df.iterrows():
+        urlNd = row['Url']
+        # print(row["Url"])
+        # print(urlNd)
+        profile = getSoup(urlNd)
+        # print(profile)
+        price = deepfetch_price(profile)
+        dPrices.append(price)
+
+        title = deepfetch_title(profile)
+        dTitles.append(title)
+
+        city = deepfetch_city(profile)
+        dCities.append(city)
+
+        date = deepfetch_date(profile)
+        dDates.append(date)
+    data = {'Price': dPrices,'Title': dTitles, 'City': dCities, 'Date': dDates}
+    
+    dataf = pd.DataFrame(data, columns=['Price', 'Title', 'City', 'Date'])
+    
+    
+    print(dataf.head())
+    print(dataf.shape)
     
 if __name__ == '__main__':
     main()
