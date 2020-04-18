@@ -1,6 +1,7 @@
 import requests
 import random
 import pandas as pd
+import click
 from bs4 import BeautifulSoup
 from utils import extractPrice, extractTitle, extractLocation, extractDate
 from mutils import normalizePrice, normalizeLocation
@@ -52,8 +53,10 @@ def rotateUserAgent():
 def getSoup(url):
     headers = rotateUserAgent()
     response = requests.get(url, headers=headers)
-    content = response.content
-    soup = BeautifulSoup(content, 'html.parser')
+    content = response.text
+    #content = response.content
+    soup = BeautifulSoup(content, 'lxml')
+    # soup = BeautifulSoup(content, 'html.parser')
 
     return soup
 
@@ -96,6 +99,9 @@ def scraper_return(prices,titles,locations,dates,urls):
     return data
 
 def scraper(url):
+    print(f'from def scraper({url})')
+    queryUrl = url
+
     soup = getSoup(url)
 
     p = howManyPages(soup)
@@ -105,83 +111,105 @@ def scraper(url):
     locations = []
     dates = []
     urls = []
-    # promoted = []
+    urls_promoted = []
 
-    containers = soup.find_all('div', class_='offer-wrapper')
+    a = soup.findAll('td', class_='title-cell')
+    # containers = soup.find_all('div', class_='offer-wrapper')
     if p == 0:
-        for x in containers:
-            # price_wrapper = x.find('p', class_='price')
-            # price = price_wrapper.find('strong').text
-            # prices.append(price)
-            prices.append(extractPrice(x))
-            
-            # title_wrapper = x.find('h3')
-            # title = title_wrapper.find('strong').text
-            # titles.append(title)
-            titles.append(extractTitle(x))
+        for x in a:
+            url = x.find('a', class_='linkWithHash')['href']
+            name = x.find('a', class_='linkWithHash')('strong')
 
-            # location_wrapper = x.find('i', attrs={'data-icon': 'location-filled'})
-            # location = location_wrapper.parent.text
-            # locations.append(location)
-            locations.append(extractLocation(x))
-
-            # date_wrapper = x.find('i', attrs={'data-icon': 'clock'})
-            # date = date_wrapper.parent.text
-            # dates.append(date)
-            dates.append(extractDate(x))
-
-            url = x.find('a', class_='linkWithHash')["href"]
-            urls.append(url)
-
-            # print(price)
-            # print(title)
+            if ';promoted' in url:
+                urls_promoted.append(url)
+            else:
+                urls.append(url)
+                titles.append(name)
     else:
         for pageNum in range(1, p):
-            pageUrl = url+'&page='+str(pageNum)
+            print(f'from else: pageNum - {pageNum}')
+
+            pageUrl = f'{queryUrl}/?page={str(pageNum)}'
+            print(f'from else: pageUrl - {pageUrl}')
+
             soup = getSoup(pageUrl)
+            a = soup.findAll('td', class_='title-cell') 
+            for x in a:
+                url = x.find('a', class_='linkWithHash')['href']
+                print(f'from else_for: {url}')
+                name = x.find('a', class_='linkWithHash')('strong')
 
-            for x in containers:
-                # price_wrapper = x.find('p', class_='price')
-                # price = price_wrapper.find('strong').text
-                # prices.append(price)
-                prices.append(extractPrice(x))
-                
-                # title_wrapper = x.find('h3')
-                # title = title_wrapper.find('strong').text
-                # titles.append(title)
-                titles.append(extractTitle(x))
+                # urls.append(url)
+                print('from here', pageUrl)
 
-                # location_wrapper = x.find('i', attrs={'data-icon': 'location-filled'})
-                # location = location_wrapper.parent.text
-                # locations.append(location)
-                locations.append(extractLocation(x))
-
-                # date_wrapper = x.find('i', attrs={'data-icon': 'clock'})
-                # date = date_wrapper.parent.text
-                # dates.append(date)
-                dates.append(extractDate(x))
-
-                url = x.find('a', class_='linkWithHash')["href"]
-                urls.append(url)
-                # print(price)
-                # print(title)
+                if ';promoted' in pageUrl:
+                    urls_promoted.append(pageUrl)
+                    # print('.')
+                    # pass
+                else:
+                    urls.append(url)
+                    titles.append(name)
 
     data = {'Price': prices,'Title': titles, 'Location': locations, 'Date': dates, 'Url': urls}
-    return data
-
-def main():
-    outputcsv = forgeOutputPath(input('ENTER FILE NAME: '))
-    url = forgeQuery(input('SEARCH KEYWORD: '))
+    data1 = {'Title': titles, 'Url': urls}
+    return data1
 
 
-    data = scraper(url)
-    df = pd.DataFrame(data, columns = ['Price','Title','Location','Date','Url'])
-    data = normalizePrice(df)
-    locdata = normalizeLocation(data)
+#     outputcsv = forgeOutputPath(input('ENTER FILE NAME: '))
+#     url = forgeQuery(input('SEARCH KEYWORD: '))
+
+
+#     data = scraper(url)
+#     df = pd.DataFrame(data, columns = ['Price','Title','Location','Date','Url'])
+#     data = normalizePrice(df)
+#     locdata = normalizeLocation(data)
+#     # print(df.head())
+#     # print(df.shape)
+#     locdata.to_csv(outputcsv, sep=',', index=False)
+#     """
+
+def categ(choice):
+    b = {
+        1 : '/nedvizhimi-imoti',
+        2 : '/avtomobili-karavani-lodki',
+        3 : '/elektronika',
+        4 : '/sport-knigi-hobi',
+        5 : '/zhivotni',
+        6 : '/dom-i-gradina',
+        7 : '/moda',
+        8 : '/za-bebeto-i-deteto',
+        9 : '/ekskurzii-pochivki',
+        10 : '/uslugi',
+        11 : '/mashini-instrumenti-biznes-oborudvane',
+        12 : '/rabota',
+        13 : '/podaryavam',
+        14 : '/ads',
+    }
+    # x = 
+    return b[choice]
+
+
+def neshto(nsh):
+    t = nsh.replace(' ', '-')
+    thing = f'/q-{t}'
+    return thing
+
+@click.command()
+@click.option("--category", prompt="Choose search category:\n1. Недвижими имоти\n2. Автомобили, каравани, лодки\n3. Електроника\n4. Спорт, книги, хоби\n5. Животни\n6. Дом и градина\n7. Мода\n8. За бебето и детето\n9. Екскурзии, почивки\n10. Услуги\n11. Машини, инструменти, бизнес оборудване\n12. Работа\n13. Подарявам\n14. Всички\nEnter number 1-14:", help="Provide your name", type=int)
+@click.option("--item", prompt="Your name", help="Provide your name")
+def main(category, item):
+    # url = f'https://www.olx.bg{categ(category)}{neshto(item)}'
+    data = scraper(f'https://www.olx.bg{categ(category)}{neshto(item)}')
+    ...
+    df = pd.DataFrame(data, columns = ['Title', 'Url'])
+    # data = normalizePrice(df)
+    # locdata = normalizeLocation(data)
     # print(df.head())
-    # print(df.shape)
-    locdata.to_csv(outputcsv, sep=',', index=False)
-
+    print(df.shape)
+    df.to_csv('from_def_main.csv', sep=',', index=False)
+    # duplicatedRs = df[df.duplicated(['Url'])]
+    # print('Duplicated rows: ', duplicatedRs, sep='\n')
+    # locdata.to_csv(outputcsv, sep=',', index=False)
     
 if __name__ == '__main__':
     main()
