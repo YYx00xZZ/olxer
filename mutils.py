@@ -15,8 +15,8 @@ def normalizeLocation(dataframe):
     for index,row in dataframe.iterrows():
         sep = ', '
         itemLocation_new = row['City'].strip()
-        print(f'from pipe normalLoc {itemLocation_new.split(sep, 2)[1]}')
-        dataframe.at[index, 'City'] = itemLocation_new.split(sep, 1)[0]
+        # print(f'from pipe normalLoc {itemLocation_new.split(sep, 2)[1]}')
+        dataframe.at[index, 'City'] = itemLocation_new.split(sep, 2)[1]
 
     return dataframe
 
