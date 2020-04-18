@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from utils import extractPrice, extractTitle, extractLocation, extractDate
 from mutils import normalizePrice, normalizeLocation
 
-from deepfetch import deepfetch, deepfetch_price, deepfetch_title, deepfetch_city, deepfetch_date
+from deepfetch import deepfetch_price, deepfetch_title, deepfetch_city, deepfetch_date
 
 user_agent_list = [
    #Chrome
@@ -157,19 +157,6 @@ def scraper(url):
     return data1
 
 
-#     outputcsv = forgeOutputPath(input('ENTER FILE NAME: '))
-#     url = forgeQuery(input('SEARCH KEYWORD: '))
-
-
-#     data = scraper(url)
-#     df = pd.DataFrame(data, columns = ['Price','Title','Location','Date','Url'])
-#     data = normalizePrice(df)
-#     locdata = normalizeLocation(data)
-#     # print(df.head())
-#     # print(df.shape)
-#     locdata.to_csv(outputcsv, sep=',', index=False)
-#     """
-
 def categ(choice):
     b = {
         1 : '/nedvizhimi-imoti',
@@ -204,7 +191,7 @@ def main(category, item):
     data = scraper(f'https://www.olx.bg{categ(category)}{neshto(item)}')
     df = pd.DataFrame(data, columns = ['Title', 'Url'])
     
-    df.to_csv('first_state.csv', sep=',', index=False)
+    df.to_csv(f'first_state{category}.csv', sep=',', index=False)
     
     dPrices = []
     dTitles = []
@@ -232,9 +219,7 @@ def main(category, item):
     
     dataf = pd.DataFrame(data, columns=['Price', 'Title', 'City', 'Date'])
     
-    
-    print(dataf.head())
-    print(dataf.shape)
+    dataf.to_csv(f'searchOn_{category}.csv', sep=',', index=False)
     
 if __name__ == '__main__':
     main()
