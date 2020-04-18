@@ -42,7 +42,8 @@ def deepfetch_price(soup):
 def deepfetch_title(soup):
     """ get  title"""
     productContainer = soup.find('div', attrs={'id':'offerdescription'})
-    title = productContainer.find('strong', class_='pricelabel__value').text
+    # title = productContainer.find('strong', class_='pricelabel__value').text
+    title = productContainer.find('h1').text
     return title
 
 
