@@ -6,7 +6,7 @@ from time import sleep
 from itertools import cycle
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent, FakeUserAgentError
-
+# from requests.adapters import HTTPAdapter
 
 def random_header():
     # Create a dict of accept headers for each user-agent.
@@ -81,29 +81,30 @@ def getSoup(link):
     # if moved, import create_pools() etc.
     # Usage example
     proxy, headers = create_pools()
-    '''    # Introduce the proxy and headers in the GET request
-        # with requests.Session() as req:
-        #         page = req.get(link, proxies={"http": proxy, "https": proxy},headers=headers, timeout=30)
     '''
-    try:
-        page = requests.get(link, proxies={"http": proxy, "https": proxy},headers=headers, timeout=30)
+    # Introduce the proxy and headers in the GET request
+    with requests.Session() as req:
+        page = req.get(link, proxies={"http": proxy, "https": proxy},headers=headers, timeout=30)
+    '''
+    with requests.Session() as req:
+        # page = req.get(link, proxies={"http": proxy, "https": proxy},headers=headers, timeout=30)
+        page = req.get(link, headers=headers, timeout=30)
         # print(proxy)
-    except requests.exceptions.RequestException as e:
-        print(e)
-        proxy, headers = create_pools()
-        click.secho("shit", fg='red')
-        sleep(1)        
-        page = requests.get(link, proxies={"http": proxy, "https": proxy},headers=headers, timeout=30)
-    # except requests.exceptions.SSLError:
-    #     proxy, headers = create_pools()
-    #     page = requests.get(link, proxies={"http": proxy, "https": proxy},headers=headers, timeout=30)
-    #     print(proxy)
-    # except requests.exceptions.ProxyError:
-    #     proxy, headers = create_pools()
-    #     page = requests.get(link, proxies={"http": proxy, "https": proxy},headers=headers, timeout=30)
-    #     print(proxy)
-
     content = page.text
     soup = BeautifulSoup(content, 'lxml')
     return soup
     
+
+def getSoup_2(url):
+    """
+    Utilty function used to get a Beautiful Soup object from a given URL
+    """
+    session = requests.Session()
+    proxy, headers = create_pools()
+    try:
+        req = session.get(url, headers=headers, proxies={"http": proxy, "https": proxy})
+    except requests.exceptions.RequestException as e:
+        # return e
+        print(e)
+    bs = BeautifulSoup(req.text, 'lxml')
+    return bs

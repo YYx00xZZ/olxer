@@ -2,15 +2,20 @@ import click
 import requests
 import random
 import logging
+import pandas as pd
 from time import sleep
 from itertools import cycle
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent, FakeUserAgentError
 
-# from multipage import getPages
-from helpers import random_header, get_proxies, create_pools, getSoup
-import multipage
+from pprint import pprint
 
+import multipage
+import itemspreview
+import singleitem
+from helpers import random_header, get_proxies, create_pools, getSoup
+
+import csv
 '''
 def random_header():
     # Create a dict of accept headers for each user-agent.
@@ -81,6 +86,7 @@ def create_pools():
 
 omg = click.style("Choose search category:\n1. Недвижими имоти\n2. Автомобили, каравани, лодки\n3. Електроника\n4. Спорт, книги, хоби\n5. Животни\n6. Дом и градина\n7. Мода\n8. За бебето и детето\n9. Екскурзии, почивки\n10. Услуги\n11. Машини, инструменти, бизнес оборудване\n12. Работа\n13. Подарявам\n14. Всички\nEnter number 1-14", fg='green')
 def categ(choice):
+    """ Match user input to corresponding topic url """
     b = {
         1 : '/nedvizhimi-imoti',
         2 : '/avtomobili-karavani-lodki',
@@ -120,6 +126,19 @@ def getSoup(link):
     return soup
 '''
 
+def per_page(supa):
+    itemContainer = supa.find_all('div', class_='offer-wrapper')
+    for x in itemContainer:
+        url = x.find('a', class_='linkWithHash')['href']
+        perPageUrl=[]
+        perPageUrl.append(url)
+
+    print(perPageUrl)
+        # if ';promoted' in url:
+        #     click.secho(url, fg='red')
+        # else:
+        #     click.secho(url, fg='green')
+
 
 @click.command()
 @click.option("--category", prompt=omg, help="Provide your name", type=int)
@@ -131,39 +150,48 @@ def main(category, item):
     link = f'{url}{category}{item}'
     pages = []
     try:
-        for x in multipage.getPages(link):
+        for pagelink in multipage.getPages(link):
             pages.append(x)
+            soup = getSoup(pagelink)
+            container = soup.find_all('div', class_='offer-wrapper')
+            for x in container:
+                print(x.find('a', class_='linkWithHash')['href'])
+            # print(x)
+            # print()
+            # print()
+            print(pagelink)
     except TypeError:
-        pages.append(link)
-
-
-    # for each item in pages get desired content
-        # a.k.a make getSoup request and scrape things
+        # pages.append(link)
+        print('.')
     print(pages)
-
+    # for i in range(len(pages)):
+    #     soup = getSoup(pages[i])
+    #     while i == i:
+    #         print(i)
+    #         per_page(soup)
+    #         i = i + 1
 '''
-    if (soup.find('div', class_='pager rel clr') != None):
-        #   #   add initial (query) link to list with links
+    # pages
 
-        # pager = soup.find('div', class_='pager rel clr')
-        # lpage = pager.find(attrs={"data-cy" : "page-link-last"}).span.text
+    # a, x = itemspreview.scrapePage(pages) # for each page, go to page and scrape all offer urls
+    # itemspreview.scrapePage(pages)
+    # targetData = singleitem.getitem(x)
 
-        # links = (link+f'/?page={p}' for p in range(2,int(lpage)))
-        # for page in links:
-        #     pages.append(page)
-        pagesUrls = getPages(link)
-        for page in pagesUrls:
-            pages.append(page)
-            print(page)
-        print('print from if')
-        print(pages)
-    else:
-        print('print from else')
-        print(pages)
 
-    print('izvun, sled vsichko')
-    print(pages)
+    # df = pd.DataFrame(targetData, columns=['productPrice','productTitle','productAddDate','userLoc',])
+    # print(df.shape)
+    # df.to_csv('targetData.csv', sep=',', index=False)
+    # for x in items['url']:
+    #     supa = getSoup(x)
+    #     productContainer = supa.find('div', attrs={'id': 'offerdescription'})
+    #     userContainer = supa.find('div', attrs={'id': 'offeractions'})
+
+    #     productPrice = productContainer.find('div', class_='pricelabel').strong.text.strip()
+    #     productTitle = productContainer.find('div', class_='offer-titlebox').h1.text.strip()
+    #     productAddDate = productContainer.find('ul', class_='offer-bottombar__items').li.em.strong.text.strip()
+    #     userLoc = userContainer.find('div', class_='offer-user__address').address.p.text.strip()
 '''
+
 
 if __name__ == '__main__':
     main()
