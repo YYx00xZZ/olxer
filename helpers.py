@@ -90,8 +90,8 @@ def getSoup(link):
         # page = req.get(link, proxies={"http": proxy, "https": proxy},headers=headers, timeout=30)
         page = req.get(link, headers=headers, timeout=30)
         # print(proxy)
-    content = page.text
-    soup = BeautifulSoup(content, 'lxml')
+    content = page.content # was .text
+    soup = BeautifulSoup(content, 'html5lib')
     return soup
     
 
